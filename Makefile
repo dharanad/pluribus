@@ -1,5 +1,7 @@
 BUILD_TYPE=Release
 
+BUILD_DIR=build
+
 CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 ifndef USE_CCACHE
@@ -8,6 +10,8 @@ USE_CCACHE=-DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 endif
 endif
 
+.PHONY: all submodules cmake build release clean
+
 all: release
 
 submodules:
@@ -15,13 +19,16 @@ submodules:
 	git submodule update --init --recursive
 
 cmake: submodules
-	mkdir -p build && \
+	mkdir -p $(BUILD_DIR) && \
 	cmake \
-		-B build \
+		-B $(BUILD_DIR) \
 		$(CMAKE_FLAGS) \
-		$(USE_CCACHE) \
+		$(USE_CCACHE)
 
-build:
-	cmake --build build -- -j$(shell nproc)
+build: cmake
+	cmake --build $(BUILD_DIR) -- -j$(shell nproc)
 
-release: cmake build
+release: build
+
+clean:
+	rm -rf $(BUILD_DIR)
