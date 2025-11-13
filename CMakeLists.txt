@@ -22,6 +22,7 @@ list(
     PREPEND
     CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/CMake"
+    "${PROJECT_SOURCE_DIR}/CMake/resolve_dependency_modules"
     "${PROJECT_SOURCE_DIR}/velox/CMake"
 )
 
@@ -36,6 +37,16 @@ set(VELOX_ENABLE_ICEBERG_FUNCTIONS OFF)
 
 # TODO: Write notes
 set(VELOX_DEPENDENCY_SOURCE AUTO CACHE STRING "Default dependency source: AUTO SYSTEM or BUNDLED.")
+
+# Add ANTLR4 runtime dependency
+velox_set_source(antlr4-runtime)
+velox_resolve_dependency(antlr4-runtime)
+message(STATUS "Using ANTLR4 runtime from ${ANTLR4_INCLUDE_DIR}")
+include_directories(${ANTLR4_INCLUDE_DIR})
+
+# velox_set_source(Protobuf)
+# velox_resolve_dependency(Protobuf 3.21.7 REQUIRED)
+# include_directories(${Protobuf_INCLUDE_DIRS})
 
 include_directories(.)
 include_directories(${CMAKE_BINARY_DIR})
