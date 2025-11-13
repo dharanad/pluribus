@@ -1,0 +1,27 @@
+BUILD_TYPE=Release
+
+CMAKE_FLAGS := -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+
+ifndef USE_CCACHE
+ifneq ($(shell which ccache), )
+USE_CCACHE=-DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+endif
+endif
+
+all: release
+
+submodules:
+	git submodule sync --recursive
+	git submodule update --init --recursive
+
+cmake: submodules
+	mkdir -p build && \
+	cmake \
+		-B build \
+		$(CMAKE_FLAGS) \
+		$(USE_CCACHE) \
+
+build:
+	cmake --build build -- -j$(shell nproc)
+
+release: cmake build
